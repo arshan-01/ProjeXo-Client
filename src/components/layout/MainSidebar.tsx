@@ -156,7 +156,10 @@ export function MainSidebar() {
         <div className="border-r flex-grow">
           <div className="flex h-14 items-center justify-between border-b px-4">
             <div className="flex items-center gap-1 sm:gap-2">
-              <span className="font-semibold text-md sm:text-lg truncate max-w-[120px] sm:max-w-[180px]" title={selectedWorkspace}>
+              <span
+                className="font-semibold text-md sm:text-lg truncate inline-block w-[120px] sm:w-[180px]"
+                title={selectedWorkspace}
+              >
                 {selectedWorkspace || "Workspace"}
               </span>
               {selectedWorkspace && (
