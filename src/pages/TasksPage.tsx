@@ -1,70 +1,83 @@
+"use client"
 
-import { useState } from "react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue 
-} from "@/components/ui/select";
+import { useState } from "react"
+import DashboardLayout from "@/components/layout/DashboardLayout"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Calendar, Clock, MoreHorizontal, Plus, Search, UsersIcon } from "lucide-react"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Clock, MoreHorizontal, Plus, Search, Users } from "lucide-react";
-import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
-  DropdownMenuLabel
-} from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import TaskComments from "@/components/tasks/TaskComments";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { toast } from "sonner"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import TaskComments from "@/components/tasks/TaskComments"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Types for our data
 interface User {
-  id: string;
-  name: string;
-  avatar: string;
+  id: string
+  name: string
+  avatar: string
 }
 
 interface Comment {
-  id: string;
-  taskId: string;
-  userId: string;
-  user: User;
-  content: string;
-  createdAt: string;
-  mentions: string[];
+  id: string
+  taskId: string
+  userId: string
+  user: User
+  content: string
+  createdAt: string
+  mentions: string[]
 }
 
 interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-  priority: string;
-  dueDate: string;
-  assignee: User;
-  tags: string[];
-  project: string;
-  comments: Comment[];
+  id: string
+  title: string
+  description: string
+  status: string
+  priority: string
+  dueDate: string
+  assignee: User
+  tags: string[]
+  project: string
+  comments: Comment[]
+}
+
+type TaskAssignee = {
+  id: string
+  name: string
+  avatar: string
+}
+
+type TaskType = {
+  id: string
+  title: string
+  description: string
+  status: string
+  priority: string
+  dueDate: string
+  assignees: TaskAssignee[] // Changed from assignee to assignees (array)
+  tags: string[]
+  project: string
 }
 
 // Sample data for users
@@ -72,24 +85,94 @@ const users = [
   {
     id: "user-1",
     name: "Alex Johnson",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=128&h=128&auto=format&fit=crop"
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=128&h=128&auto=format&fit=crop",
   },
   {
     id: "user-2",
     name: "Sam Wilson",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=128&h=128&auto=format&fit=crop"
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=128&h=128&auto=format&fit=crop",
   },
   {
     id: "user-3",
     name: "Emma Davis",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128&auto=format&fit=crop"
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128&auto=format&fit=crop",
+  },
+  { id: "user-4", name: "Michael Brown", avatar: "" },
+  {
+    id: "user-5",
+    name: "Olivia Garcia",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=128&h=128&auto=format&fit=crop",
+  },
+]
+
+const initialTasks: TaskType[] = [
+  {
+    id: "task-1",
+    title: "Design new dashboard wireframes",
+    description: "Create wireframes for the new analytics dashboard",
+    status: "todo",
+    priority: "high",
+    dueDate: "2025-05-25",
+    assignees: [users[0]],
+    tags: ["design", "ui/ux"],
+    project: "Website Redesign",
   },
   {
-    id: "user-4",
-    name: "Michael Brown",
-    avatar: ""
-  }
-];
+    id: "task-2",
+    title: "Implement user authentication",
+    description: "Add JWT authentication to the backend API",
+    status: "in-progress",
+    priority: "high",
+    dueDate: "2025-05-20",
+    assignees: [users[1], users[4]],
+    tags: ["backend", "security"],
+    project: "Mobile App Development",
+  },
+  {
+    id: "task-3",
+    title: "Create component documentation",
+    description: "Document all reusable UI components",
+    status: "in-progress",
+    priority: "medium",
+    dueDate: "2025-05-22",
+    assignees: [users[2]],
+    tags: ["documentation", "ui"],
+    project: "Website Redesign",
+  },
+  {
+    id: "task-4",
+    title: "Write API integration tests",
+    description: "Create comprehensive tests for all API endpoints",
+    status: "todo",
+    priority: "medium",
+    dueDate: "2025-05-27",
+    assignees: [users[1], users[3]],
+    tags: ["testing", "backend"],
+    project: "Mobile App Development",
+  },
+  {
+    id: "task-5",
+    title: "Fix responsive layout issues",
+    description: "Address responsive design issues on mobile devices",
+    status: "completed",
+    priority: "high",
+    dueDate: "2025-05-15",
+    assignees: [users[0], users[2], users[4]],
+    tags: ["bug", "frontend"],
+    project: "Website Redesign",
+  },
+  {
+    id: "task-6",
+    title: "Optimize database queries",
+    description: "Improve performance of slow database queries",
+    status: "completed",
+    priority: "high",
+    dueDate: "2025-05-12",
+    assignees: [users[3]],
+    tags: ["performance", "database"],
+    project: "Mobile App Development",
+  },
+]
 
 // Sample data for task comments
 const sampleComments = [
@@ -100,16 +183,16 @@ const sampleComments = [
     user: users[1],
     content: "I think we should add more details to the wireframes. @AlexJohnson what do you think?",
     createdAt: "2025-05-15T14:30:00Z",
-    mentions: ["AlexJohnson"]
+    mentions: ["AlexJohnson"],
   },
   {
     id: "comment-2",
     taskId: "task-1",
-    userId: "user-1", 
+    userId: "user-1",
     user: users[0],
     content: "I agree @SamWilson. Let's discuss this in our next meeting.",
     createdAt: "2025-05-15T15:45:00Z",
-    mentions: ["SamWilson"]
+    mentions: ["SamWilson"],
   },
   {
     id: "comment-3",
@@ -118,169 +201,70 @@ const sampleComments = [
     user: users[2],
     content: "I can help with the authentication implementation if needed.",
     createdAt: "2025-05-16T09:15:00Z",
-    mentions: []
-  }
-];
+    mentions: [],
+  },
+]
 
 // Status and priority options
 const statusOptions = [
   { value: "todo", label: "To Do" },
   { value: "in-progress", label: "In Progress" },
-  { value: "completed", label: "Completed" }
-];
+  { value: "completed", label: "Completed" },
+]
 
 const priorityOptions = [
   { value: "low", label: "Low" },
   { value: "medium", label: "Medium" },
-  { value: "high", label: "High" }
-];
-
-// Sample data for tasks
-const initialTasks = [
-  {
-    id: "task-1",
-    title: "Design new dashboard wireframes",
-    description: "Create wireframes for the new analytics dashboard",
-    status: "todo",
-    priority: "high",
-    dueDate: "2025-05-25",
-    assignee: {
-      id: "user-1",
-      name: "Alex Johnson",
-      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=128&h=128&auto=format&fit=crop"
-    },
-    tags: ["design", "ui/ux"],
-    project: "Website Redesign",
-    comments: sampleComments.filter(comment => comment.taskId === "task-1")
-  },
-  {
-    id: "task-2",
-    title: "Implement user authentication",
-    description: "Add JWT authentication to the backend API",
-    status: "in-progress",
-    priority: "high",
-    dueDate: "2025-05-20",
-    assignee: {
-      id: "user-2",
-      name: "Sam Wilson",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=128&h=128&auto=format&fit=crop"
-    },
-    tags: ["backend", "security"],
-    project: "Mobile App Development",
-    comments: sampleComments.filter(comment => comment.taskId === "task-2")
-  },
-  {
-    id: "task-3",
-    title: "Create component documentation",
-    description: "Document all reusable UI components",
-    status: "in-progress",
-    priority: "medium",
-    dueDate: "2025-05-22",
-    assignee: {
-      id: "user-3",
-      name: "Emma Davis",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128&auto=format&fit=crop"
-    },
-    tags: ["documentation", "ui"],
-    project: "Website Redesign",
-    comments: []
-  },
-  {
-    id: "task-4",
-    title: "Write API integration tests",
-    description: "Create comprehensive tests for all API endpoints",
-    status: "todo",
-    priority: "medium",
-    dueDate: "2025-05-27",
-    assignee: {
-      id: "user-2",
-      name: "Sam Wilson",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=128&h=128&auto=format&fit=crop"
-    },
-    tags: ["testing", "backend"],
-    project: "Mobile App Development",
-    comments: []
-  },
-  {
-    id: "task-5",
-    title: "Fix responsive layout issues",
-    description: "Address responsive design issues on mobile devices",
-    status: "completed",
-    priority: "high",
-    dueDate: "2025-05-15",
-    assignee: {
-      id: "user-1",
-      name: "Alex Johnson",
-      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=128&h=128&auto=format&fit=crop"
-    },
-    tags: ["bug", "frontend"],
-    project: "Website Redesign",
-    comments: []
-  },
-  {
-    id: "task-6",
-    title: "Optimize database queries",
-    description: "Improve performance of slow database queries",
-    status: "completed",
-    priority: "high",
-    dueDate: "2025-05-12",
-    assignee: {
-      id: "user-4",
-      name: "Michael Brown",
-      avatar: ""
-    },
-    tags: ["performance", "database"],
-    project: "Mobile App Development",
-    comments: []
-  }
-];
+  { value: "high", label: "High" },
+]
 
 const statusColors: Record<string, string> = {
-  "todo": "bg-gray-100 text-gray-800",
+  todo: "bg-gray-100 text-gray-800",
   "in-progress": "bg-blue-100 text-blue-800",
-  "completed": "bg-green-100 text-green-800",
-};
+  completed: "bg-green-100 text-green-800",
+}
 
 const priorityColors: Record<string, string> = {
-  "low": "bg-gray-100 text-gray-800",
-  "medium": "bg-yellow-100 text-yellow-800",
-  "high": "bg-red-100 text-red-800",
-};
+  low: "bg-gray-100 text-gray-800",
+  medium: "bg-yellow-100 text-yellow-800",
+  high: "bg-red-100 text-red-800",
+}
 
 // Projects data
-const projects = [
-  "Website Redesign",
-  "Mobile App Development"
-];
+const projects = ["Website Redesign", "Mobile App Development"]
 
 // Helper function to get user initials
 const getInitials = (name: string) => {
-  if (!name) return "?";
-  return name.split(' ').map(part => part.charAt(0)).join('').toUpperCase();
-};
+  if (!name) return "?"
+  return name
+    .split(" ")
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase()
+}
 
 export default function TasksPage() {
-  const [view, setView] = useState<"list" | "board">("list");
-  const [filter, setFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [activeTaskTab, setActiveTaskTab] = useState("details");
-  
+  const [view, setView] = useState<"list" | "board">("list")
+  const [filter, setFilter] = useState("all")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [tasks, setTasks] = useState<any[]>(initialTasks)
+  const [activeTaskTab, setActiveTaskTab] = useState("details")
+
   // Dialog states
-  const [taskDialog, setTaskDialog] = useState({ open: false, mode: "view", taskId: "" });
-  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState({ open: false, taskId: "" });
-  
+  const [taskDialog, setTaskDialog] = useState({ open: false, mode: "view", taskId: "" })
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState({ open: false, taskId: "" })
+
   // New/Edit task state
   const [editTask, setEditTask] = useState<{
-    id: string;
-    title: string;
-    description: string;
-    status: string;
-    priority: string;
-    dueDate: string;
-    assigneeId: string;
-    tags: string;
-    project: string;
+    id: string
+    title: string
+    description: string
+    status: string
+    priority: string
+    dueDate: string
+    assigneeId: string | string[]
+    tags: string
+    project: string
   }>({
     id: "",
     title: "",
@@ -290,25 +274,25 @@ export default function TasksPage() {
     dueDate: "",
     assigneeId: "",
     tags: "",
-    project: ""
-  });
-  
+    project: "",
+  })
+
   // Filter tasks based on filter and search query
-  const filteredTasks = tasks.filter(task => {
-    if (filter !== "all" && task.status !== filter) return false;
-    if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    return true;
-  });
+  const filteredTasks = tasks.filter((task) => {
+    if (filter !== "all" && task.status !== filter) return false
+    if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) return false
+    return true
+  })
 
   const formatDate = (dateStr: string) => {
-    if (!dateStr) return 'Invalid Date';
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return 'Invalid Date';
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
-  };
+    if (!dateStr) return "Invalid Date"
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return "Invalid Date"
+    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(date)
+  }
 
   // Open task dialog
-  const openTaskDialog = (mode: "create" | "edit" | "view", taskId: string = "") => {
+  const openTaskDialog = (mode: "create" | "edit" | "view", taskId = "") => {
     if (mode === "create") {
       setEditTask({
         id: `task-${tasks.length + 1}`,
@@ -316,14 +300,14 @@ export default function TasksPage() {
         description: "",
         status: "todo",
         priority: "medium",
-        dueDate: new Date().toISOString().split('T')[0],
-        assigneeId: "",
+        dueDate: new Date().toISOString().split("T")[0],
+        assigneeId: [], // Changed from "" to []
         tags: "",
-        project: projects[0]
-      });
-      setActiveTaskTab("details");
+        project: projects[0],
+      })
+      setActiveTaskTab("details")
     } else {
-      const task = tasks.find(t => t.id === taskId);
+      const task = tasks.find((t) => t.id === taskId)
       if (task) {
         setEditTask({
           id: task.id,
@@ -332,25 +316,30 @@ export default function TasksPage() {
           status: task.status,
           priority: task.priority,
           dueDate: task.dueDate,
-          assigneeId: task.assignee.id || "",
+          assigneeId: task.assignees.map((a) => a.id), // Changed to map assignees to an array of IDs
           tags: task.tags.join(", "),
-          project: task.project
-        });
+          project: task.project,
+        })
       }
     }
-    
-    setTaskDialog({ open: true, mode, taskId });
-  };
-  
+
+    setTaskDialog({ open: true, mode, taskId })
+  }
+
   // Save task
   const saveTask = () => {
     if (!editTask.title.trim()) {
-      toast.error("Task title is required");
-      return;
+      toast.error("Task title is required")
+      return
     }
-    
-    const assignee = users.find(u => u.id === editTask.assigneeId) || users[0];
-    
+
+    // Get all selected assignees
+    const assignees = Array.isArray(editTask.assigneeId)
+      ? editTask.assigneeId.map((id) => users.find((u) => u.id === id)).filter(Boolean)
+      : editTask.assigneeId
+        ? [users.find((u) => u.id === editTask.assigneeId)].filter(Boolean)
+        : []
+
     const updatedTask = {
       id: editTask.id,
       title: editTask.title,
@@ -358,73 +347,118 @@ export default function TasksPage() {
       status: editTask.status,
       priority: editTask.priority,
       dueDate: editTask.dueDate,
-      assignee: assignee,
-      tags: editTask.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+      assignees: assignees, // Use the array of assignee objects
+      tags: editTask.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag),
       project: editTask.project,
-      comments: [] as Comment[]
-    };
-    
+      comments: [] as Comment[],
+    }
+
     if (taskDialog.mode === "create") {
-      setTasks([...tasks, updatedTask]);
-      toast.success("Task created successfully");
+      setTasks([...tasks, updatedTask])
+      toast.success("Task created successfully")
     } else {
       // Preserve existing comments when updating a task
-      const existingTask = tasks.find(t => t.id === editTask.id);
+      const existingTask = tasks.find((t) => t.id === editTask.id)
       if (existingTask) {
-        updatedTask.comments = existingTask.comments;
+        updatedTask.comments = existingTask.comments
       }
-      
-      setTasks(tasks.map(task => task.id === editTask.id ? updatedTask : task));
-      toast.success("Task updated successfully");
+
+      setTasks(tasks.map((task) => (task.id === editTask.id ? updatedTask : task)))
+      toast.success("Task updated successfully")
     }
-    
-    setTaskDialog({ open: false, mode: "view", taskId: "" });
-  };
-  
+
+    setTaskDialog({ open: false, mode: "view", taskId: "" })
+  }
+
   // Delete task
   const deleteTask = () => {
-    setTasks(tasks.filter(task => task.id !== deleteConfirmDialog.taskId));
-    setDeleteConfirmDialog({ open: false, taskId: "" });
-    toast.success("Task deleted successfully");
-  };
+    setTasks(tasks.filter((task) => task.id !== deleteConfirmDialog.taskId))
+    setDeleteConfirmDialog({ open: false, taskId: "" })
+    toast.success("Task deleted successfully")
+  }
 
   // Find current task for comments
-  const currentTask = tasks.find(task => task.id === taskDialog.taskId);
+  const currentTask = tasks.find((task) => task.id === taskDialog.taskId)
 
   // Save comment to task
   const updateTaskComments = (taskId: string, comments: Comment[]) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId 
-        ? { ...task, comments } 
-        : task
-    ));
-  };
+    setTasks(tasks.map((task) => (task.id === taskId ? { ...task, comments } : task)))
+  }
+
+  // --- Inline Editing Handlers ---
+  const handleAssigneeToggle = (taskId: string, assigneeIdToToggle: string) => {
+    const taskToUpdate = tasks.find((t) => t.id === taskId)
+    if (!taskToUpdate) return
+
+    const isAlreadyAssigned = taskToUpdate.assignees.some((a) => a.id === assigneeIdToToggle)
+    let newAssignees: TaskAssignee[]
+
+    if (isAlreadyAssigned) {
+      newAssignees = taskToUpdate.assignees.filter((a) => a.id !== assigneeIdToToggle)
+    } else {
+      const assigneeToAdd = users.find((u) => u.id === assigneeIdToToggle)
+      if (assigneeToAdd) {
+        newAssignees = [...taskToUpdate.assignees, assigneeToAdd]
+      } else {
+        return // Assignee not found, should not happen
+      }
+    }
+
+    setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, assignees: newAssignees } : task)))
+    const userToggled = users.find((u) => u.id === assigneeIdToToggle)?.name || "User"
+    toast.success(
+      `${userToggled} ${isAlreadyAssigned ? "unassigned from" : "assigned to"} task "${taskToUpdate.title}"`,
+    )
+  }
+
+  // Component to render stacked avatars
+  const StackedAvatars = ({ assignees, maxShow = 3 }: { assignees: TaskAssignee[]; maxShow?: number }) => (
+    <div className="flex -space-x-2">
+      {assignees?.slice(0, maxShow).map((assignee) => (
+        <Avatar key={assignee.id} className="h-8 w-8 border-2 border-background">
+          <AvatarImage src={assignee.avatar || "/placeholder.svg"} alt={assignee.name} />
+          <AvatarFallback>{getInitials(assignee.name)}</AvatarFallback>
+        </Avatar>
+      ))}
+      {assignees?.length > maxShow && (
+        <Avatar className="h-8 w-8 border-2 border-background bg-muted text-muted-foreground">
+          <AvatarFallback>+{assignees.length - maxShow}</AvatarFallback>
+        </Avatar>
+      )}
+      {assignees?.length === 0 && (
+        <Avatar className="h-8 w-8 border-2 border-background bg-muted text-muted-foreground">
+          <AvatarFallback>
+            <UsersIcon className="h-4 w-4" />
+          </AvatarFallback>
+        </Avatar>
+      )}
+    </div>
+  )
 
   // Handle status change in dropdowns
   const handleStatusChange = (taskId: string, newStatus: string) => {
-    const taskToUpdate = tasks.find(t => t.id === taskId);
-    if (!taskToUpdate) return;
-    
-    setTasks(prevTasks => prevTasks.map(task => 
-      task.id === taskId ? { ...task, status: newStatus } : task
-    ));
-    
-    const statusLabel = statusOptions.find(s => s.value === newStatus)?.label || newStatus;
-    toast.success(`Status changed to ${statusLabel} for task "${taskToUpdate.title}"`);
-  };
+    const taskToUpdate = tasks.find((t) => t.id === taskId)
+    if (!taskToUpdate) return
 
-  // Handle priority change in dropdowns  
+    setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, status: newStatus } : task)))
+
+    const statusLabel = statusOptions.find((s) => s.value === newStatus)?.label || newStatus
+    toast.success(`Status changed to ${statusLabel} for task "${taskToUpdate.title}"`)
+  }
+
+  // Handle priority change in dropdowns
   const handlePriorityChange = (taskId: string, newPriority: string) => {
-    const taskToUpdate = tasks.find(t => t.id === taskId);
-    if (!taskToUpdate) return;
-    
-    setTasks(prevTasks => prevTasks.map(task => 
-      task.id === taskId ? { ...task, priority: newPriority } : task
-    ));
-    
-    const priorityLabel = priorityOptions.find(p => p.value === newPriority)?.label || newPriority;
-    toast.success(`Priority changed to ${priorityLabel} for task "${taskToUpdate.title}"`);
-  };
+    const taskToUpdate = tasks.find((t) => t.id === taskId)
+    if (!taskToUpdate) return
+
+    setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, priority: newPriority } : task)))
+
+    const priorityLabel = priorityOptions.find((p) => p.value === newPriority)?.label || newPriority
+    toast.success(`Priority changed to ${priorityLabel} for task "${taskToUpdate.title}"`)
+  }
 
   return (
     <DashboardLayout>
@@ -483,21 +517,22 @@ export default function TasksPage() {
         {view === "list" && (
           <div className="rounded-md border">
             <div className="grid grid-cols-12 gap-2 p-4 font-medium text-sm bg-muted">
-              <div className="col-span-5">Task</div>
+              <div className="col-span-3">Task</div>
               <div className="col-span-2">Status</div>
               <div className="col-span-2">Priority</div>
+              <div className="col-span-2">Assignees</div>
               <div className="col-span-2">Due Date</div>
               <div className="col-span-1">Actions</div>
             </div>
             {filteredTasks.map((task) => (
               <div key={task.id} className="grid grid-cols-12 gap-2 p-4 border-t items-center">
-                <div className="col-span-5">
+                <div className="col-span-3">
                   <div className="font-medium">{task.title}</div>
                   <div className="text-sm text-muted-foreground">{task.project}</div>
                   {task.comments && task.comments.length > 0 && (
                     <div className="mt-1 text-xs text-blue-500 flex items-center">
                       <Clock className="h-3 w-3 mr-1" />
-                      {task.comments.length} comment{task.comments.length > 1 ? 's' : ''}
+                      {task.comments.length} comment{task.comments.length > 1 ? "s" : ""}
                     </div>
                   )}
                 </div>
@@ -506,13 +541,13 @@ export default function TasksPage() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-8 px-2 -ml-2">
                         <Badge variant="secondary" className={statusColors[task.status]}>
-                          {task.status.replace('-', ' ')}
+                          {task.status.replace("-", " ")}
                         </Badge>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
                       <DropdownMenuLabel>Change Status</DropdownMenuLabel>
-                      {statusOptions.map(option => (
+                      {statusOptions.map((option) => (
                         <DropdownMenuCheckboxItem
                           key={option.value}
                           checked={task.status === option.value}
@@ -535,7 +570,7 @@ export default function TasksPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
                       <DropdownMenuLabel>Change Priority</DropdownMenuLabel>
-                      {priorityOptions.map(option => (
+                      {priorityOptions.map((option) => (
                         <DropdownMenuCheckboxItem
                           key={option.value}
                           checked={task.priority === option.value}
@@ -548,10 +583,36 @@ export default function TasksPage() {
                   </DropdownMenu>
                 </div>
                 <div className="col-span-2 flex items-center">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-full">
+                        <StackedAvatars assignees={task.assignees} />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56">
+                      <DropdownMenuLabel>Assign Users</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {users?.map((user) => (
+                        <DropdownMenuCheckboxItem
+                          key={user.id}
+                          checked={task.assignees?.some((a) => a.id === user.id)}
+                          onCheckedChange={() => handleAssigneeToggle(task.id, user.id)}
+                        >
+                          <Avatar className="h-5 w-5 mr-2">
+                            <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+                            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                          </Avatar>
+                          {user.name}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="col-span-2 flex items-center">
                   <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">{formatDate(task.dueDate)}</span>
                 </div>
-                <div className="col-span-1 text-right">
+                <div className="col-span-1 text-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm">
@@ -563,7 +624,7 @@ export default function TasksPage() {
                       <DropdownMenuItem onClick={() => openTaskDialog("view", task.id)}>View details</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => openTaskDialog("edit", task.id)}>Edit task</DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         className="text-destructive"
                         onClick={() => setDeleteConfirmDialog({ open: true, taskId: task.id })}
                       >
@@ -575,9 +636,7 @@ export default function TasksPage() {
               </div>
             ))}
             {filteredTasks.length === 0 && (
-              <div className="p-8 text-center text-muted-foreground">
-                No tasks found matching your criteria.
-              </div>
+              <div className="p-8 text-center text-muted-foreground">No tasks found matching your criteria.</div>
             )}
           </div>
         )}
@@ -585,203 +644,39 @@ export default function TasksPage() {
         {/* Board View */}
         {view === "board" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* To Do Column */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium text-muted-foreground">To Do</h3>
-                <Badge variant="outline">{filteredTasks.filter(t => t.status === 'todo').length}</Badge>
-              </div>
-              {filteredTasks
-                .filter(task => task.status === 'todo')
-                .map(task => (
+            {["todo", "in-progress", "completed"].map(statusKey => (
+              <div key={statusKey} className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-muted-foreground">{statusOptions.find(s => s.value === statusKey)?.label || statusKey}</h3>
+                  <Badge variant="outline">{filteredTasks.filter(t => t.status === statusKey).length}</Badge>
+                </div>
+                {filteredTasks.filter(task => task.status === statusKey).map(task => (
                   <Card key={task.id}>
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <Badge variant="secondary" className={priorityColors[task.priority]}>
-                          {task.priority}
-                        </Badge>
+                        <Badge variant="secondary" className={`${priorityColors[task.priority]} capitalize`}>{priorityOptions.find(p => p.value === task.priority)?.label || task.priority}</Badge>
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
+                          <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openTaskDialog("view", task.id)}>View details</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => openTaskDialog("edit", task.id)}>Edit task</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openTaskDialog("view", task.id)}>View</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openTaskDialog("edit", task.id)}>Edit</DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              className="text-destructive"
-                              onClick={() => setDeleteConfirmDialog({ open: true, taskId: task.id })}
-                            >
-                              Delete
-                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive" onClick={() => setDeleteConfirmDialog({ open: true, taskId: task.id })}>Delete</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
                       <CardTitle className="text-base">{task.title}</CardTitle>
                       <CardDescription className="text-sm line-clamp-2">{task.description}</CardDescription>
                     </CardHeader>
-                    <CardContent className="pb-2">
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {task.tags.map(tag => (
-                          <Badge key={tag} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      {task.comments && task.comments.length > 0 && (
-                        <div className="mt-1 text-xs text-blue-500 flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {task.comments.length} comment{task.comments.length > 1 ? 's' : ''}
-                        </div>
-                      )}
-                    </CardContent>
+                    <CardContent className="pb-2"><div className="flex flex-wrap gap-1 mb-2">{task.tags.map(tag => (<Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>))}</div></CardContent>
                     <CardFooter className="pt-0 flex items-center justify-between">
-                      <div className="flex items-center text-xs text-muted-foreground">
-                        <Clock className="mr-1 h-3 w-3" />
-                        {formatDate(task.dueDate)}
-                      </div>
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={task.assignee.avatar} alt={task.assignee.name} />
-                        <AvatarFallback>{getInitials(task.assignee.name)}</AvatarFallback>
-                      </Avatar>
+                      <div className="flex items-center text-xs text-muted-foreground"><Clock className="mr-1 h-3 w-3" />{formatDate(task.dueDate)}</div>
+                      <div className="flex items-center"> <StackedAvatars assignees={task.assignees} maxShow={2} /> </div>
                     </CardFooter>
                   </Card>
                 ))}
-            </div>
-
-            {/* In Progress Column */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium text-muted-foreground">In Progress</h3>
-                <Badge variant="outline">{filteredTasks.filter(t => t.status === 'in-progress').length}</Badge>
               </div>
-              {filteredTasks
-                .filter(task => task.status === 'in-progress')
-                .map(task => (
-                  <Card key={task.id}>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <Badge variant="secondary" className={priorityColors[task.priority]}>
-                          {task.priority}
-                        </Badge>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openTaskDialog("view", task.id)}>View details</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => openTaskDialog("edit", task.id)}>Edit task</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              className="text-destructive"
-                              onClick={() => setDeleteConfirmDialog({ open: true, taskId: task.id })}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                      <CardTitle className="text-base">{task.title}</CardTitle>
-                      <CardDescription className="text-sm line-clamp-2">{task.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pb-2">
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {task.tags.map(tag => (
-                          <Badge key={tag} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      {task.comments && task.comments.length > 0 && (
-                        <div className="mt-1 text-xs text-blue-500 flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {task.comments.length} comment{task.comments.length > 1 ? 's' : ''}
-                        </div>
-                      )}
-                    </CardContent>
-                    <CardFooter className="pt-0 flex items-center justify-between">
-                      <div className="flex items-center text-xs text-muted-foreground">
-                        <Clock className="mr-1 h-3 w-3" />
-                        {formatDate(task.dueDate)}
-                      </div>
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={task.assignee.avatar} alt={task.assignee.name} />
-                        <AvatarFallback>{getInitials(task.assignee.name)}</AvatarFallback>
-                      </Avatar>
-                    </CardFooter>
-                  </Card>
-                ))}
-            </div>
-
-            {/* Completed Column */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium text-muted-foreground">Completed</h3>
-                <Badge variant="outline">{filteredTasks.filter(t => t.status === 'completed').length}</Badge>
-              </div>
-              {filteredTasks
-                .filter(task => task.status === 'completed')
-                .map(task => (
-                  <Card key={task.id}>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <Badge variant="secondary" className={priorityColors[task.priority]}>
-                          {task.priority}
-                        </Badge>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openTaskDialog("view", task.id)}>View details</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => openTaskDialog("edit", task.id)}>Edit task</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              className="text-destructive"
-                              onClick={() => setDeleteConfirmDialog({ open: true, taskId: task.id })}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                      <CardTitle className="text-base">{task.title}</CardTitle>
-                      <CardDescription className="text-sm line-clamp-2">{task.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pb-2">
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {task.tags.map(tag => (
-                          <Badge key={tag} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      {task.comments && task.comments.length > 0 && (
-                        <div className="mt-1 text-xs text-blue-500 flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {task.comments.length} comment{task.comments.length > 1 ? 's' : ''}
-                        </div>
-                      )}
-                    </CardContent>
-                    <CardFooter className="pt-0 flex items-center justify-between">
-                      <div className="flex items-center text-xs text-muted-foreground">
-                        <Clock className="mr-1 h-3 w-3" />
-                        {formatDate(task.dueDate)}
-                      </div>
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={task.assignee.avatar} alt={task.assignee.name} />
-                        <AvatarFallback>{getInitials(task.assignee.name)}</AvatarFallback>
-                      </Avatar>
-                    </CardFooter>
-                  </Card>
-                ))}
-            </div>
+            ))}
           </div>
         )}
 
@@ -790,15 +685,21 @@ export default function TasksPage() {
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>
-                {taskDialog.mode === "create" ? "Create New Task" : 
-                 taskDialog.mode === "edit" ? "Edit Task" : "Task Details"}
+                {taskDialog.mode === "create"
+                  ? "Create New Task"
+                  : taskDialog.mode === "edit"
+                    ? "Edit Task"
+                    : "Task Details"}
               </DialogTitle>
               <DialogDescription>
-                {taskDialog.mode === "create" ? "Add a new task to your project" : 
-                 taskDialog.mode === "edit" ? "Edit the task details" : "View task details"}
+                {taskDialog.mode === "create"
+                  ? "Add a new task to your project"
+                  : taskDialog.mode === "edit"
+                    ? "Edit the task details"
+                    : "View task details"}
               </DialogDescription>
             </DialogHeader>
-            
+
             {taskDialog.mode === "view" && (
               <Tabs value={activeTaskTab} onValueChange={setActiveTaskTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
@@ -810,27 +711,23 @@ export default function TasksPage() {
                     <h3 className="text-lg font-medium">{editTask.title}</h3>
                     <p className="text-sm text-muted-foreground">{editTask.project}</p>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm font-medium">Status</p>
-                      <Badge className={statusColors[editTask.status]}>
-                        {editTask.status.replace('-', ' ')}
-                      </Badge>
+                      <Badge className={statusColors[editTask.status]}>{editTask.status.replace("-", " ")}</Badge>
                     </div>
                     <div>
                       <p className="text-sm font-medium">Priority</p>
-                      <Badge className={priorityColors[editTask.priority]}>
-                        {editTask.priority}
-                      </Badge>
+                      <Badge className={priorityColors[editTask.priority]}>{editTask.priority}</Badge>
                     </div>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm font-medium">Description</p>
                     <p className="text-sm">{editTask.description}</p>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm font-medium">Due Date</p>
@@ -840,44 +737,44 @@ export default function TasksPage() {
                       <p className="text-sm font-medium">Assignee</p>
                       <div className="flex items-center gap-2 mt-1">
                         <Avatar className="h-6 w-6">
-                          <AvatarImage 
-                            src={users.find(u => u.id === editTask.assigneeId)?.avatar} 
-                            alt={users.find(u => u.id === editTask.assigneeId)?.name || ""}
+                          <AvatarImage
+                            src={users.find((u) => u.id === editTask.assigneeId)?.avatar || "/placeholder.svg"}
+                            alt={users.find((u) => u.id === editTask.assigneeId)?.name || ""}
                           />
                           <AvatarFallback>
-                            {getInitials(users.find(u => u.id === editTask.assigneeId)?.name || "")}
+                            {getInitials(users.find((u) => u.id === editTask.assigneeId)?.name || "")}
                           </AvatarFallback>
                         </Avatar>
                         <span className="text-sm">
-                          {users.find(u => u.id === editTask.assigneeId)?.name || "Unassigned"}
+                          {users.find((u) => u.id === editTask.assigneeId)?.name || "Unassigned"}
                         </span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm font-medium">Tags</p>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {editTask.tags.split(',').map(tag => tag.trim()).filter(tag => tag).map((tag) => (
-                        <Badge key={tag} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
+                      {editTask.tags
+                        .split(",")
+                        .map((tag) => tag.trim())
+                        .filter((tag) => tag)
+                        .map((tag) => (
+                          <Badge key={tag} variant="outline" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
                     </div>
                   </div>
                 </TabsContent>
                 <TabsContent value="comments" className="pt-4">
                   {currentTask && (
-                    <TaskComments 
-                      taskId={currentTask.id} 
-                      users={users} 
-                      initialComments={currentTask.comments}
-                    />
+                    <TaskComments taskId={currentTask.id} users={users} initialComments={currentTask.comments} />
                   )}
                 </TabsContent>
               </Tabs>
             )}
-            
+
             {(taskDialog.mode === "create" || taskDialog.mode === "edit") && (
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -889,7 +786,7 @@ export default function TasksPage() {
                     placeholder="Task title"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
                   <Textarea
@@ -900,12 +797,12 @@ export default function TasksPage() {
                     rows={3}
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="status">Status</Label>
-                    <Select 
-                      value={editTask.status} 
+                    <Select
+                      value={editTask.status}
                       onValueChange={(value) => setEditTask({ ...editTask, status: value })}
                     >
                       <SelectTrigger>
@@ -918,7 +815,7 @@ export default function TasksPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="priority">Priority</Label>
                     <Select
@@ -936,7 +833,7 @@ export default function TasksPage() {
                     </Select>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="dueDate">Due Date</Label>
@@ -947,27 +844,58 @@ export default function TasksPage() {
                       onChange={(e) => setEditTask({ ...editTask, dueDate: e.target.value })}
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="assignee">Assignee</Label>
-                    <Select
-                      value={editTask.assigneeId}
-                      onValueChange={(value) => setEditTask({ ...editTask, assigneeId: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select assignee" />
-                      </SelectTrigger>
-                      <SelectContent>
+                    <Label htmlFor="assignees">Assignees</Label>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="w-full justify-start text-left font-normal">
+                          {Array.isArray(editTask.assigneeId)
+                            ? editTask.assigneeId.filter((id) => id).length > 0
+                              ? `${editTask.assigneeId.filter((id) => id).length} user(s) selected`
+                              : "Select assignees"
+                            : editTask.assigneeId
+                              ? "1 user selected"
+                              : "Select assignees"}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-full sm:w-[calc(theme( muchísimo.sm.max-w-[600px])/2-theme(spacing.8))]">
+                        {" "}
+                        {/* Adjust width */}
+                        <DropdownMenuLabel>Assign Users</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
                         {users.map((user) => (
-                          <SelectItem key={user.id} value={user.id}>
+                          <DropdownMenuCheckboxItem
+                            key={user.id}
+                            checked={editTask.assigneeId.includes(user.id)}
+                            onCheckedChange={(checked) => {
+                              setEditTask((prev) => ({
+                                ...prev,
+                                assigneeId: checked
+                                  ? [
+                                    ...(Array.isArray(prev.assigneeId) ? prev.assigneeId : [prev.assigneeId]).filter(
+                                      (id) => id,
+                                    ),
+                                    user.id,
+                                  ]
+                                  : (Array.isArray(prev.assigneeId) ? prev.assigneeId : [prev.assigneeId]).filter(
+                                    (id) => id && id !== user.id,
+                                  ),
+                              }))
+                            }}
+                          >
+                            <Avatar className="h-5 w-5 mr-2">
+                              <AvatarImage src={user.avatar || "/placeholder.svg"} />
+                              <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                            </Avatar>
                             {user.name}
-                          </SelectItem>
+                          </DropdownMenuCheckboxItem>
                         ))}
-                      </SelectContent>
-                    </Select>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="tags">Tags</Label>
@@ -978,7 +906,7 @@ export default function TasksPage() {
                       placeholder="Comma separated tags"
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="project">Project</Label>
                     <Select
@@ -1000,7 +928,7 @@ export default function TasksPage() {
                 </div>
               </div>
             )}
-            
+
             <DialogFooter>
               <Button variant="outline" onClick={() => setTaskDialog({ open: false, mode: "view", taskId: "" })}>
                 {taskDialog.mode === "view" ? "Close" : "Cancel"}
@@ -1010,16 +938,17 @@ export default function TasksPage() {
                   Edit Task
                 </Button>
               ) : (
-                <Button onClick={saveTask}>
-                  {taskDialog.mode === "create" ? "Create Task" : "Save Changes"}
-                </Button>
+                <Button onClick={saveTask}>{taskDialog.mode === "create" ? "Create Task" : "Save Changes"}</Button>
               )}
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
         {/* Delete Confirmation Dialog */}
-        <Dialog open={deleteConfirmDialog.open} onOpenChange={(open) => setDeleteConfirmDialog({ ...deleteConfirmDialog, open })}>
+        <Dialog
+          open={deleteConfirmDialog.open}
+          onOpenChange={(open) => setDeleteConfirmDialog({ ...deleteConfirmDialog, open })}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Confirm Deletion</DialogTitle>
@@ -1039,5 +968,5 @@ export default function TasksPage() {
         </Dialog>
       </div>
     </DashboardLayout>
-  );
+  )
 }
