@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// Card container with consistent height and vertical layout
+// Card container with dynamic height controlled by parent
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -15,7 +15,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm min-h-[250px]", // consistent size
+      "flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm",
       className
     )}
     {...props}

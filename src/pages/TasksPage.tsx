@@ -651,7 +651,7 @@ export default function TasksPage() {
                   <Badge variant="outline">{filteredTasks.filter(t => t.status === statusKey).length}</Badge>
                 </div>
                 {filteredTasks.filter(task => task.status === statusKey).map(task => (
-                  <Card key={task.id}>
+                  <Card key={task.id} className="min-h-[250px] max-h-[400px] overflow-y-auto">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         <Badge variant="secondary" className={`${priorityColors[task.priority]} capitalize`}>{priorityOptions.find(p => p.value === task.priority)?.label || task.priority}</Badge>
