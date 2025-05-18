@@ -1,7 +1,13 @@
-import * as React from "react"
+// components/ui/card.tsx
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-import { cn } from "@/lib/utils"
-
+// Card container with consistent height and vertical layout
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -9,14 +15,15 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      "flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm min-h-[250px]", // consistent size
       className
     )}
     {...props}
   />
-))
-Card.displayName = "Card"
+));
+Card.displayName = "Card";
 
+// Header
 const CardHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -26,24 +33,35 @@ const CardHeader = React.forwardRef<
     className={cn("flex flex-col space-y-1.5 p-6", className)}
     {...props}
   />
-))
-CardHeader.displayName = "CardHeader"
+));
+CardHeader.displayName = "CardHeader";
 
+// Title with tooltip on hover
 const CardTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <h3
-    ref={ref}
-    className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
-      className
-    )}
-    {...props}
-  />
-))
-CardTitle.displayName = "CardTitle"
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement> & { title?: string }
+>(({ className, children, title, ...props }, ref) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <h3
+        ref={ref}
+        className={cn(
+          "text-2xl font-semibold leading-tight tracking-tight line-clamp-2 cursor-default",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </h3>
+    </TooltipTrigger>
+    <TooltipContent>
+      <p className="text-sm max-w-xs">{title || children}</p>
+    </TooltipContent>
+  </Tooltip>
+));
+CardTitle.displayName = "CardTitle";
 
+// Description
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
@@ -53,17 +71,23 @@ const CardDescription = React.forwardRef<
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
-))
-CardDescription.displayName = "CardDescription"
+));
+CardDescription.displayName = "CardDescription";
 
+// Scrollable content section
 const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
-))
-CardContent.displayName = "CardContent"
+  <div
+    ref={ref}
+    className={cn("p-6 pt-0 overflow-y-auto flex-1", className)} // scrolls if content overflows
+    {...props}
+  />
+));
+CardContent.displayName = "CardContent";
 
+// Footer
 const CardFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -73,7 +97,15 @@ const CardFooter = React.forwardRef<
     className={cn("flex items-center p-6 pt-0", className)}
     {...props}
   />
-))
-CardFooter.displayName = "CardFooter"
+));
+CardFooter.displayName = "CardFooter";
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+// Export all
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent
+};
